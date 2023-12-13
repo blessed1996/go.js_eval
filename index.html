@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <script src="https://unpkg.com/gojs/release/go-debug.js"></script>
+
+    <script>
+
+        function init() {
+            /* created variable $ to call create diagram function of go.js */
+            var co = go.GraphObject.make;
+            firstDiagram = co(go.Diagram, "firstDiagramDiv");
+            var nodeDataArray = [
+                { key: "Alpha", color: "lime" },
+                { key: "Beta", color: "cyan" },
+                { key: "Zeta", isGroup: true },
+                { key: "Delta", color: "pink", group: "Zeta" },
+                { key: "Gamma", color: "maroon", group: "Zeta" }
+            ];
+            var linkDataArray = [
+               /* { to: "Beta", from: "Alpha", color: "red" },
+                { from: "Alpha", to: "Zeta" }
+                { toRelinkable: true, fromRelinkable: true } */
+            ];
+            firstDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+            
+            firstDiagram.nodeTemplate = co(go.Node, "Auto",
+                                            co(go.Shape, "RoundedRectangle", { fill: "white", portId: "", fromLinkable: true, toLinkable: true },
+                                                new go.Binding("fill", "color")
+                                            ),
+                                            co(go.TextBlock, "text", { margin: 10 },
+                                                new go.Binding("text", "key")
+                                            )
+                                        );
+
+            firstDiagram.linkTemplate = co(go.Link, { relinkableFrom: true, relinkableTo: true },
+                                            co(go.Shape, { strokeWidth: 3 },
+                                                new go.Binding("stroke", "color")
+                                            ),
+                                            co(go.Shape, { toArrow: "Standard", stroke: null},
+                                                new go.Binding("fill", "color")
+                                            )
+                                        );
+
+            firstDiagram.toolManager.relinkingTool.fromHandleArchetype = 
+                co(go.Shape, "Diamond", { desiredSize: new go.Size(15,15), stroke: "green", fill: "lime", segmentIndex: 0});
+    
+            firstDiagram.toolManager.relinkingTool.toHandleArchetype = 
+                co(go.Shape, "Diamond", { desiredSize: new go.Size(15,15), stroke: "red", fill: "pink", segmentIndex: -1});
+
+        }
+
+    </script>
+
+</head>
+
+<body onload="init()">
+    
+    <h1>Evaluation of go.js</h1>
+
+    <div id="firstDiagramDiv" style="width: 1000px; height: 600px; border: 1px solid black;"></div>
+
+</body>
+</html>

@@ -11,11 +11,11 @@
             var co = go.GraphObject.make;
             firstDiagram = co(go.Diagram, "firstDiagramDiv");
             var nodeDataArray = [
-                { key: "Alpha", color: "lime" },
-                { key: "Beta", color: "cyan" },
-                { key: "Zeta", isGroup: true },
+                { icon: "icons/256x256/yinyang.png" },
+                { key: "Beta", color: "cyan", icon: "icons/256x256/airplane.png" }
+            /*    { key: "Zeta", isGroup: true },
                 { key: "Delta", color: "pink", group: "Zeta" },
-                { key: "Gamma", color: "maroon", group: "Zeta" }
+                { key: "Gamma", color: "maroon", group: "Zeta" } */
             ];
             var linkDataArray = [
                /* { to: "Beta", from: "Alpha", color: "red" },
@@ -27,6 +27,10 @@
             firstDiagram.nodeTemplate = co(go.Node, "Auto",
                                             co(go.Shape, "RoundedRectangle", { fill: "white", portId: "", fromLinkable: true, toLinkable: true },
                                                 new go.Binding("fill", "color")
+                                            ),
+                                            co(go.Picture,
+                                                    { margin: 10, width: 50, height:50 },
+                                                    new go.Binding("source", "icon")
                                             ),
                                             co(go.TextBlock, "text", { margin: 10 },
                                                 new go.Binding("text", "key")

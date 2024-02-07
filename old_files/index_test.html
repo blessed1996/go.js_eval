@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/gojs/release/go-debug.js"></script>
+    <script>
+        var myDiagram;
+
+        function init() {
+            var co = go.GraphObject.make;
+
+            myDiagram = co(go.Diagram, "myDiagramDiv", {
+                "undoManager.isEnabled": true,
+                "TextEdited": onTextEdited
+            });
+
+            var nodeDataArray = [
+                { icon: "icons/256x256/yinyang.png" },
+                { icon: "icons/256x256/airplane.png" },
+                { icon: "icons/256x256/airplane.png" }
+            ];
+
+            var linkDataArray = [
+                // Link-Daten
+            ];
+
+            myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+
+            myDiagram.nodeTemplate = co(go.Node, "Spot",
+                co(go.Panel, "Auto",
+                    co(go.Shape, "Circle", { fill: "white", portId: "", fromLinkable: true, toLinkable: true, cursor: "pointer", desiredSize: new go.Size(75, 75) }),
+                    co(go.Picture,
+                        { margin: 10, width: 50, height: 50 },
+                        new go.Binding("source", "icon")
+                    )
+                ),
+                co(go.TextBlock,
+                    { alignment: go.Spot.Bottom, margin: 5, editable: true },
+                    new go.Binding("text", "key").makeTwoWay()
+                )
+            );
+
+            myDiagram.linkTemplate = co(go.Link, go.Link.Orthogonal,
+                { corner: 5 },
+                co(go.Shape, { strokeWidth: 4, stroke: "#00a4a4" })
+            );
+
+            numberNodes(myDiagram);
+        }
+
+        function numberNodes(diagram) {
+            var count = 1;
+            diagram.model.nodeDataArray.forEach(function(node) {
+                node.key = "Node " + count++;
+            });
+            diagram.model = new go.GraphLinksModel(diagram.model.nodeDataArray, diagram.model.linkDataArray);
+        }
+
+        function onTextEdited(e) {
+            rearrangeNumbers();
+        }
+
+        function rearrangeNumbers() {
+            var nodes = myDiagram.model.nodeDataArray;
+            var usedNumbers = new Set();
+            nodes.forEach(node => {
+                var num = parseInt(node.key.replace("Node ", ""));
+                if (!isNaN(num)) {
+                    usedNumbers.add(num);
+                }
+            });
+
+            var count = 1;
+            nodes.forEach(node => {
+                var currentNum = parseInt(node.key.replace("Node ", ""));
+                if (isNaN(currentNum) || usedNumbers.has(count)) {
+                    while (usedNumbers.has(count)) {
+                        count++;
+                    }
+                    node.key = "Node " + count;
+                    usedNumbers.add(count);
+                } else {
+                    count = currentNum + 1;
+                }
+            });
+
+            myDiagram.model.updateAllTargetBindings();
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</head>
+<body>
+    <h1>Evaluation of go.js</h1>
+    <div id="myDiagramDiv" style="width: 1000px; height: 600px; border: 1px solid black;"></div>
+</body>
+</html>
